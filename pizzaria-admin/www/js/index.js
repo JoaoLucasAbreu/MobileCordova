@@ -1,29 +1,45 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+const itensCardapio = [
+    {pizza: "Quatro Queijos", preco:"R$:45,00", imagem:'url("https://4.bp.blogspot.com/-u3xPiG3U_Qk/VaFwLCS8kwI/AAAAAAAATko/DHpSZA0nIfs/s1600/Pizza%2Bestranha.jpg")'},
+    {pizza: "Calabresa", preco:"R$:35,00", imagem:'url("https://www.fatosdesconhecidos.com.br/wp-content/uploads/2019/07/pizza.jpg")'},
+    {pizza: "Frango", preco:"R$:50,00", imagem:'url("https://www.fatosdesconhecidos.com.br/wp-content/uploads/2019/07/pizza.jpg")'}
+]
 
-// Wait for the deviceready event before using any of Cordova's device APIs.
-// See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
+var itemAtual = 0;
+var imagem;
+
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
-    // Cordova is now initialized. Have fun!
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('deviceready').classList.add('ready');
+    document.getElementById('esquerda').addEventListener('click', esquerda);
+    document.getElementById('direita').addEventListener('click', direita);
+    document.getElementById('btnNovo').addEventListener('click', showOptions);
+    imagem = document.getElementById('imagem')
+}
+
+function esquerda(){
+    if (itemAtual>0){
+        itemAtual --;
+   }else{
+    itemAtual = itensCardapio.length - 1;
+   }
+    atualizarTela();
+}
+
+function direita(){
+    if (itemAtual < itensCardapio.length){
+        itemAtual ++;
+   }else{
+    itemAtual = 0;
+   }
+    atualizarTela();
+}
+
+function atualizarTela(){
+    imagem.style.backgroundImage = itensCardapio[itemAtual].imagem;
+}
+
+function showOptions() {
+    document.getElementById('app-lista').style.display = 'none';
 }
