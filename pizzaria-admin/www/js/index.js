@@ -1,45 +1,88 @@
-const itensCardapio = [
-    {pizza: "Quatro Queijos", preco:"R$:45,00", imagem:'url("https://4.bp.blogspot.com/-u3xPiG3U_Qk/VaFwLCS8kwI/AAAAAAAATko/DHpSZA0nIfs/s1600/Pizza%2Bestranha.jpg")'},
-    {pizza: "Calabresa", preco:"R$:35,00", imagem:'url("https://www.fatosdesconhecidos.com.br/wp-content/uploads/2019/07/pizza.jpg")'},
-    {pizza: "Frango", preco:"R$:50,00", imagem:'url("https://www.fatosdesconhecidos.com.br/wp-content/uploads/2019/07/pizza.jpg")'}
-]
-
-var itemAtual = 0;
+var pizza;
+var preco;
 var imagem;
+var PIZZARIA_ID = 'Pizzaria da Mooca Belo'
+
+var itensCardapio;
+var itemAtual = 0;
 
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
-
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('esquerda').addEventListener('click', esquerda);
-    document.getElementById('direita').addEventListener('click', direita);
-    document.getElementById('btnNovo').addEventListener('click', showOptions);
-    imagem = document.getElementById('imagem')
+    //document.getElementById('deviceready').classList.add('ready');
+    cordova.plugin.http.setDataSerializer('json');
+    imagem = document.getElementById('imagem');
+    pizza = document.getElementById('pizza');
+    preco = document.getElementById('preco');
+    document.getElementById('btnNovo').addEventListener('click', novo);
+    document.getElementById('btnFoto').addEventListener('click', foto);
+    document.getElementById('btnSalvar').addEventListener('click', salvar);
+    document.getElementById('btnExcluir').addEventListener('click', excluir);
+    document.getElementById('btnCancelar').addEventListener('click', cancelar);
 }
 
-function esquerda(){
-    if (itemAtual>0){
-        itemAtual --;
-   }else{
-    itemAtual = itensCardapio.length - 1;
-   }
-    atualizarTela();
+function novo() {
+    applista.style.display = 'none'; // oculta lista
+    appcadastro.style.display = 'flex'; // exibe cadastro 
+    console.log('oi') 
 }
 
-function direita(){
-    if (itemAtual < itensCardapio.length){
-        itemAtual ++;
-   }else{
-    itemAtual = 0;
-   }
-    atualizarTela();
+//ta dando erro
+const foto = () => {
+    navigator.camera.getPicture(onSuccess, 
+                                onFail, 
+                                { quality: 50, 
+                                  destinationType: Camera.DestinationType.DATA_URL }
+                               );  
+    
+    function onSuccess(imageData) {
+        preview.style.backgroundImage = "url('data:image/jpeg;base64," + imageData + "')"; 
+    }  
+    
+    function onFail(message) { 
+        alert('Failed because: ' + message); 
+    }
 }
 
-function atualizarTela(){
-    imagem.style.backgroundImage = itensCardapio[itemAtual].imagem;
+function salvar() {
+    // espeficica o formato JSON para os dados enviados
+    cordova.plugin.http.setDataSerializer('json');
+    cordova.plugin.http.post('https://pedidos-pizzaria.glitch.me/admin/pizza/', {
+        pizzaria: PIZZARIA_ID, 
+        pizza: pizza.value, 
+        preco: preco.value, 
+        imagem: imagem.style.backgroundImage
+    }, {}, function(response) {
+        // verifica se deu certo (status = 200)
+        alert(response.status);
+    }, function(response) {
+        alert(response.error);
+    });
 }
 
-function showOptions() {
-    document.getElementById('app-lista').style.display = 'none';
+function excluir() {
+    //terminar função de deletar
+    cordova.plugin.http.delete('https://pedidos-pizzaria.glitch.me/admin/pizzas/:PIZZARIA_ID', {}, {}, 
+    function(response) {
+        itensCardapio = JSON.parse(response.data);
+        atualizarTela();
+    }, function(response) {
+        alert(response.error);
+    });
+}
+
+function cancelar() {  
+    //voltar pra tela inicial
+}
+
+function carregarPizzas() {
+    //terminar função de mostrar as pizzas cadastradas
+    cordova.plugin.http.get('https://pedidos-pizzaria.glitch.me/admin/pizzas/:PIZZARIA_ID', {}, {}, 
+    function(response) {
+        itensCardapio = JSON.parse(response.data);
+        atualizarTela();
+    }, function(response) {
+        alert(response.error);
+    });
 }
